@@ -1,0 +1,5 @@
+.venv/
+warpx_directory/
+__pycache__/
+*.pyc
+.DS_Store
