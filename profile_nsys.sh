@@ -12,7 +12,6 @@ nsys profile \
     --trace=cuda,mpi,osrt,nvtx,cublas \
     --sample=cpu \
     --cpuctxsw=true \
-    --thread-state=true \
     --stats=true \
     --output="${OUTPUT_FILE}" \
     --force-overwrite=true \

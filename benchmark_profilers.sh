@@ -13,11 +13,13 @@ echo "=========================================================="
 rm -f warpx_nsys_profile_*.nsys-rep warpx_pytorch_trace.json
 rm -rf hpctoolkit-python3-measurements-* hpctoolkit-python3-database
 
+# Export PYTHONPATH to include the CMake-built WarpX bindings
+export PYTHONPATH="$(pwd)/warpx_directory/WarpX/build/python_out:$PYTHONPATH"
+
 # Function to run and measure a command
 time_command() {
     local profiler_name=$1
     shift
-    local cmd=("$@")
     
     echo ""
     echo "----------------------------------------------------------"
@@ -27,11 +29,27 @@ time_command() {
     # We use /usr/bin/time to get wall clock time and peak memory
     # Format string outputs: Wall clock time in seconds, Max Resident Set Size in KB
     # Output to a temporary file so we can parse it
-    /usr/bin/time -f "%e|%M" -o time_out.tmp "${cmd[@]}"
+    if ! /usr/bin/time -f "%e|%M" -o time_out.tmp "$@"; then
+        echo "  [!] Command failed to execute properly."
+        rm -f time_out.tmp
+        if [ "$profiler_name" == "Baseline (No Profiler)" ]; then
+            BASELINE_TIME=0
+        fi
+        return 1
+    fi
     
     # Read the output
     IFS='|' read -r wall_time peak_memory < time_out.tmp
     rm -f time_out.tmp
+    
+    # Validate parsed time
+    if ! [[ $wall_time =~ ^[0-9]+([.][0-9]+)?$ ]]; then
+        echo "  [!] Failed to parse timing output."
+        if [ "$profiler_name" == "Baseline (No Profiler)" ]; then
+            BASELINE_TIME=0
+        fi
+        return 1
+    fi
     
     # Print metrics
     echo "✔ Completed: $profiler_name"
@@ -43,8 +61,12 @@ time_command() {
         BASELINE_TIME=$wall_time
     else
         # Calculate overhead percentage: (Profiler Time - Baseline Time) / Baseline Time * 100
-        OVERHEAD=$(awk -v t1="$wall_time" -v t2="$BASELINE_TIME" 'BEGIN { printf "%.2f", ((t1 - t2) / t2) * 100 }')
-        echo "  - Time Overhead    : $OVERHEAD %"
+        if [ "$BASELINE_TIME" != "0" ] && [ -n "$BASELINE_TIME" ]; then
+            OVERHEAD=$(awk -v t1="$wall_time" -v t2="$BASELINE_TIME" 'BEGIN { printf "%.2f", ((t1 - t2) / t2) * 100 }')
+            echo "  - Time Overhead    : $OVERHEAD %"
+        else
+            echo "  - Time Overhead    : N/A (Baseline failed)"
+        fi
     fi
 }
 
