@@ -14,10 +14,13 @@ fi
 # Set environment variables for HPC-Toolkit (if needed)
 export HPCRUN_EVENT_LIST="REALTIME@1000 gpu=cuda"
 
+# Ensure Python can find WarpX when running this script standalone
+export PYTHONPATH="$(pwd)/warpx_directory/WarpX/build/python_out:$PYTHONPATH"
+
 # Step 1: Measure
 # We profile the MPI execution using hpcrun
 echo "Running hpcrun..."
-hpcrun -e REALTIME@1000 -e gpu=cuda mpiexec -n 4 python3 run_lwfa.py
+hpcrun -e REALTIME@1000 -e gpu=cuda mpiexec -n 4 .venv/bin/python3 run_lwfa.py
 
 # Step 2: Analyze
 # Assuming hpctoolkit measurement directory is generated as hpctoolkit-python3-measurements
