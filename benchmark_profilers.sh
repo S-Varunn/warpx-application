@@ -102,6 +102,33 @@ else
     echo "  - Trace File Size  : N/A (Failed to generate measurements)"
 fi
 
+# 5. PInsight
+# We need to start LTTng, run the trace, and then stop it
+echo "Setting up LTTng for PInsight..."
+# Clean up any existing session with this name just in case
+lttng destroy warpx-trace-session-benchmark 2>/dev/null || true
+lttng create warpx-trace-session-benchmark
+lttng enable-event --userspace "python_pinsight_lttng_ust:*"
+lttng enable-event --userspace "lttng_pinsight_cuda:*"
+lttng enable-event --userspace "lttng_pinsight_pmpi:*"
+lttng start
+
+# PInsight needs its own module in PYTHONPATH
+export PYTHONPATH="$HOME/pinsight/build:$PYTHONPATH"
+time_command "PInsight" mpiexec -n 4 -x LD_PRELOAD=$HOME/pinsight/build/libpinsight.so python3 -m pinsight run_lwfa.py
+
+echo "Stopping LTTng..."
+lttng stop
+lttng destroy warpx-trace-session-benchmark
+
+TRACE_DIR=$(ls -d $HOME/lttng-traces/warpx-trace-session-benchmark-* 2>/dev/null | tail -n 1)
+if [ ! -z "$TRACE_DIR" ]; then
+    SIZE=$(du -sh $TRACE_DIR | cut -f1)
+    echo "  - Trace File Size  : $SIZE (LTTng Trace Directory)"
+else
+    echo "  - Trace File Size  : N/A (Failed to generate trace)"
+fi
+
 echo ""
 echo "=========================================================="
 echo " Benchmarking complete. Use these metrics (Time Overhead, "
