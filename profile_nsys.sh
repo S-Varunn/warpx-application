@@ -11,7 +11,7 @@ OUTPUT_FILE="warpx_nsys_profile_%q{OMPI_COMM_WORLD_RANK}"
 nsys profile \
     --trace=cuda,mpi,osrt,nvtx,cublas \
     --sample=cpu \
-    --cpuctxsw=true \
+    --cpuctxsw=process-tree \
     --stats=true \
     --output="${OUTPUT_FILE}" \
     --force-overwrite=true \
