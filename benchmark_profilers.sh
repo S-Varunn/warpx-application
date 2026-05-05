@@ -2,6 +2,10 @@
 # Script to benchmark the overhead and performance of various profilers
 # This helps in comparing PInsight with Nsight Systems, HPCToolkit, and PyTorch Profiler
 
+# Automatically log all output to a file while still printing to terminal
+LOG_FILE="benchmark_profilers_run.log"
+exec > >(tee -i "$LOG_FILE") 2>&1
+
 echo "=========================================================="
 echo "    PROFILER OVERHEAD & RESOURCE BENCHMARKING SCRIPT      "
 echo "=========================================================="
