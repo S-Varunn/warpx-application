@@ -33,7 +33,7 @@ if [ ! -z "$MEASUREMENT_DIR" ]; then
     hpcstruct $(which python3)
     
     echo "Running hpcprof to generate the database..."
-    hpcprof -S python3.hpcstruct -I . $MEASUREMENT_DIR
+    hpcprof -S python3.hpcstruct $MEASUREMENT_DIR
     
     echo "HPC-Toolkit profiling complete. Use hpcviewer to visualize the database."
 else
