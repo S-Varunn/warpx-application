@@ -98,8 +98,8 @@ fi
 
 # 4. HPC-Toolkit (Maximized)
 time_command "HPC-Toolkit" ./profile_hpctoolkit.sh
-MEASUREMENT_DIR=$(ls -d hpctoolkit-python3-measurements-* 2>/dev/null | tail -n 1)
-if [ ! -z "$MEASUREMENT_DIR" ]; then
+MEASUREMENT_DIR="hpctoolkit-measurements"
+if [ -d "$MEASUREMENT_DIR" ]; then
     SIZE=$(du -sh $MEASUREMENT_DIR | cut -f1)
     echo "  - Trace File Size  : $SIZE (Measurement Directory)"
 else

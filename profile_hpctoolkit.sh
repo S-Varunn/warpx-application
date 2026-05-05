@@ -20,11 +20,11 @@ export PYTHONPATH="$(pwd)/warpx_directory/WarpX/build/python_out:$PYTHONPATH"
 # Step 1: Measure
 # We profile the MPI execution using hpcrun
 echo "Running hpcrun..."
-hpcrun -e REALTIME@1000 -e gpu=cuda mpiexec -n 4 .venv/bin/python3 run_lwfa.py
+hpcrun -o hpctoolkit-measurements -e REALTIME@1000 -e gpu=cuda mpiexec -n 4 .venv/bin/python3 run_lwfa.py
 
 # Step 2: Analyze
-# Assuming hpctoolkit measurement directory is generated as hpctoolkit-python3-measurements
-MEASUREMENT_DIR=$(ls -d hpctoolkit-python3-measurements-* 2>/dev/null | tail -n 1)
+# The measurement directory is now explicitly named 'hpctoolkit-measurements'
+MEASUREMENT_DIR="hpctoolkit-measurements"
 
 if [ ! -z "$MEASUREMENT_DIR" ]; then
     echo "Measurement directory found: $MEASUREMENT_DIR"
