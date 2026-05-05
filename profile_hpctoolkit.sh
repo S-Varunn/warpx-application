@@ -4,6 +4,13 @@
 
 echo "Starting HPC-Toolkit profiling..."
 
+# Automatically load Spack and HPCToolkit if available
+if [ -f "$HOME/spack/share/spack/setup-env.sh" ]; then
+    source "$HOME/spack/share/spack/setup-env.sh"
+    # Load the latest installed version (which should be the one with +cuda +python)
+    spack load hpctoolkit
+fi
+
 # Set environment variables for HPC-Toolkit (if needed)
 export HPCRUN_EVENT_LIST="REALTIME@1000 WALLCLOCK@1000 CPUTIME@1000 gpu=nvidia"
 

@@ -3,3 +3,12 @@ warpx_directory/
 __pycache__/
 *.pyc
 .DS_Store
+
+# Profiler Trace Outputs
+*.nsys-rep
+*.sqlite
+*.log
+warpx-trace-session-benchmark-*
+warpx_pytorch_trace.json
+hpctoolkit-python3-measurements-*
+hpctoolkit-python3-database/
